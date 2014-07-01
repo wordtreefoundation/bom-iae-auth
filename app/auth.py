@@ -9,6 +9,7 @@ from functools import wraps
 import datetime
 import jwt
 import iso8601
+import os
 from os import environ
 
 # Use a Class-based config to avoid needing a 2nd file
