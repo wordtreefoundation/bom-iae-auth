@@ -41,7 +41,6 @@ def get_from_environ(*args):
     e = {}
     for key in args:
         if environ.get(key):
-            print 'setting ' + key + ' to ' + environ[key]
             e[key] = environ[key]
     return e
 
@@ -53,7 +52,7 @@ def create_app(test_config=None):                   # For automated tests
     c = app.config
 
     # Load local_settings.py if file exists         # For automated tests
-    app.config.from_pyfile('local_config.py')
+    app.config.from_pyfile('local_config.py', True)
 
     app.config.update(get_from_environ(
         'MAIL_USERNAME',
