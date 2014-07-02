@@ -9,7 +9,7 @@ MAIL_PORT     = 465
 MAIL_USE_SSL  = True                            # Some servers use MAIL_USE_TLS=True instead
 MAIL_USERNAME = 'user@yourdomain.com'
 MAIL_PASSWORD = 'password-change-me'
-MAIL_DEFAULT_SENDER = '"Admin" <info@yourdomain.com>'
+DEFAULT_MAIL_SENDER = '"Admin" <info@yourdomain.com>'
 
 # Configure Annotator JWT (JSON Web Token)
 CONSUMER_KEY = 'annotateit-key-change-me'

@@ -15,7 +15,17 @@ from os import environ
 # Use a Class-based config to avoid needing a 2nd file
 class ConfigClass(object):
     CSRF_ENABLED = True
+
+    CONSUMER_KEY = 'annotateit'
     CONSUMER_TTL = 86400
+
+    DB_URI = 'sqlite:////data/bom-iae-auth.sqlite'
+
+    # Configure mail
+    MAIL_SERVER  = 'smtp.mailgun.org'
+    MAIL_PORT    = 587
+    MAIL_USE_SSL = True
+    DEFAULT_MAIL_SENDER = '"WordTree" <info@wordtree.org>'
 
     # Configure Flask-User
     USER_ENABLE_USERNAME         = True
@@ -27,6 +37,14 @@ class ConfigClass(object):
     USER_LOGIN_TEMPLATE = 'flask_user/login_or_register.html'
     USER_REGISTER_TEMPLATE = 'flask_user/login_or_register.html'
 
+def get_from_environ(*args):
+    e = {}
+    for key in args:
+        if environ.get(key):
+            print 'setting ' + key + ' to ' + environ[key]
+            e[key] = environ[key]
+    return e
+
 def create_app(test_config=None):                   # For automated tests
     # Setup Flask and read config from ConfigClass defined above
     app = Flask(__name__)
@@ -37,20 +55,17 @@ def create_app(test_config=None):                   # For automated tests
     # Load local_settings.py if file exists         # For automated tests
     app.config.from_pyfile('local_config.py')
 
-    mailgun_username = environ.get('MAILGUN_USERNAME')
-    if mailgun_username:
-        c['MAIL_SERVER'] = 'smtp.mailgun.org'
-        c['MAIL_PORT'] = 465
-        c['MAIL_USE_TLS'] = True
-        c['MAIL_USERNAME'] = mailgun_username
-        c['MAIL_PASSWORD'] = environ['MAILGUN_PASSWORD']
-        c['MAIL_DEFAULT_SENDER'] = environ.get('MAILGUN_SENDER', mailgun_username)
+    app.config.update(get_from_environ(
+        'MAIL_USERNAME',
+        'MAIL_PASSWORD',
+        'DEFAULT_MAIL_SENDER',
+        'CONSUMER_KEY',
+        'CONSUMER_SECRET',
+        'DB_URI'
+    ))
 
-    consumer_secret = environ['CONSUMER_SECRET']
-    c['CONSUMER_KEY'] = environ.get('CONSUMER_KEY', 'annotateit')
-    c['CONSUMER_SECRET'] = consumer_secret
-    c['SECRET_KEY'] = environ.get('SECRET_KEY', consumer_secret)
-    c['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URI', 'sqlite:////data/bom-iae-auth.sqlite')
+    c['SECRET_KEY'] = environ.get('SECRET_KEY', c['CONSUMER_SECRET'])
+    c['SQLALCHEMY_DATABASE_URI'] = c['DB_URI']
 
     # Load optional test_config                     # For automated tests
     if test_config:
@@ -106,14 +121,6 @@ def create_app(test_config=None):                   # For automated tests
     # Setup Flask-User
     db_adapter = SQLAlchemyAdapter(db,  User)       # Select database adapter
     user_manager = UserManager(db_adapter, app)     # Init Flask-User and bind to app
-
-    # Display Login page or Profile page
-    # @app.route('/')
-    # def home_page():
-    #     if current_user.is_authenticated():
-    #         return redirect(url_for('profile_page'))
-    #     else:
-    #         return redirect(url_for('user.login'))
 
     # The '/profile' page requires a logged-in user
     @app.route('/user/profile')
