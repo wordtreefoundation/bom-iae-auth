@@ -23,7 +23,7 @@ class ConfigClass(object):
 
     # Configure mail
     MAIL_SERVER  = 'smtp.mailgun.org'
-    MAIL_PORT    = 587
+    MAIL_PORT    = 465
     MAIL_USE_SSL = True
     DEFAULT_MAIL_SENDER = '"WordTree" <info@wordtree.org>'
 
