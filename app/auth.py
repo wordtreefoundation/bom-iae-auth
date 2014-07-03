@@ -63,7 +63,8 @@ def create_app(test_config=None):                   # For automated tests
         'DB_URI'
     ))
 
-    c['SECRET_KEY'] = environ.get('SECRET_KEY', c['CONSUMER_SECRET'])
+    if c.get('CONSUMER_SECRET') and c.get('SECRET_KEY') == None
+        c['SECRET_KEY'] = c.get('CONSUMER_SECRET')
     c['SQLALCHEMY_DATABASE_URI'] = c['DB_URI']
 
     # Load optional test_config                     # For automated tests
